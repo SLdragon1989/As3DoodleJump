@@ -1,4 +1,4 @@
-package
+﻿package
 {
 	import flash.display.Sprite;
 	import flash.display.StageScaleMode;
@@ -39,8 +39,9 @@ package
 		private var uiLayer:Sprite;
 		private var bgLayer:Sprite;
 		
-		private var normalStickArr:Vector.<NormalStick>;
 		private var stageStickArr:Vector.<Stick>;
+		
+		private var normalStickArr:Vector.<NormalStick>;
 		private var movingStickArr:Vector.<MovingStick>;
 		private var brokenStickArr:Vector.<BrokenStick>;
 		private var glassStickArr:Vector.<GlassStick>;
@@ -63,6 +64,7 @@ package
 			addChild(sceneLayer = new Sprite());
 			addChild(charLayer = new Sprite());
 			addChild(uiLayer = new Sprite());
+			
 			keyDictionary = new Dictionary();
 			
 			normalStickArr = new Vector.<NormalStick>;
@@ -87,12 +89,14 @@ package
 			doodle.vVelocity = 0;
 			doodle.hVelocity = 0;
 			
+			//初始位置
 			charLayer.addChild(doodle);
 			doodle.x = stage.stageWidth / 2;
 			doodle.y = stage.stageHeight - 100;
 			
 			stageStickArr = new Vector.<Stick>;
 			
+			//设置初始位置
 			stageStickArr.push(new NormalStick());
 			sceneLayer.addChild(stageStickArr[0]);
 			stageStickArr[0].x = stage.stageWidth / 2;
@@ -114,6 +118,8 @@ package
 		private function startGame():void
 		{
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			
+			
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		}
@@ -145,7 +151,9 @@ package
 				doodle.hVelocity += 4;
 				
 			//moving visual
-			doodle.x += doodle.hVelocity;
+			doodle.x += doodle.hVelocity;//左右移动
+			
+			
 			if (doodle.y <= stage.stageHeight - S - 35 && doodle.vVelocity < 0)
 			{
 				for each (var stick:Stick in stageStickArr)
