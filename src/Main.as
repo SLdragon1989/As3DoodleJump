@@ -22,7 +22,7 @@
 		public static var stageWidth:Number;
 		public static var stageHeight:Number;
 		
-		public static const V0:Number = -20; //速度默认值
+		public static const V0:Number = -20; //default speed
 		public static const S:Number = 20 * 20 / 2;
 		public static const GRAVITY:Number = 1;
 		
@@ -89,14 +89,14 @@
 			doodle.vVelocity = 0;
 			doodle.hVelocity = 0;
 			
-			//初始位置
+			//initial position
 			charLayer.addChild(doodle);
 			doodle.x = stage.stageWidth / 2;
 			doodle.y = stage.stageHeight - 100;
 			
 			stageStickArr = new Vector.<Stick>;
 			
-			//设置初始位置
+			//initial stick position
 			stageStickArr.push(new NormalStick());
 			sceneLayer.addChild(stageStickArr[0]);
 			stageStickArr[0].x = stage.stageWidth / 2;
@@ -150,25 +150,25 @@
 				doodle.hVelocity += 4;
 			
 			//moving visual
-			doodle.x += doodle.hVelocity; //左右移动
+			doodle.x += doodle.hVelocity; 
 			
-			//当速度向上时，且到达一定的高度后
+			//When reach a certain height
 			if (doodle.y <= stage.stageHeight - S - 35 && doodle.vVelocity < 0)
 			{
-				//所有Stick会向上平移
+				//move stick
 				for each (var stick:Stick in stageStickArr)
 					stick.y -= doodle.vVelocity;
-				//显示分数
+				//show score
 				score -= doodle.vVelocity;
 				scoreText.text = String(score);
 			}
 			else
 			{
 				
-				//下落过程
+				//prevent penetration
 				for (var i:int = 0; i < 2; i++)
 				{
-					//防止穿透
+					//fall
 					if (doodle.vVelocity >= 0)
 					{
 						
@@ -180,7 +180,7 @@
 								
 								if (stick is BrokenStick)
 								{
-									BrokenStick(stick).drop(); //碰到易碎物件
+									BrokenStick(stick).drop(); //hit the brokenStick
 									doodle.vVelocity = V0 / 4;
 								}
 								else
@@ -188,7 +188,7 @@
 									doodle.y = stick.y - doodle.height / 2 - stick.height / 2;
 									doodle.vVelocity = V0;
 									if (stick is GlassStick)
-										stick.y = stageHeight + 200; //让其超出屏幕，不可见
+										stick.y = stageHeight + 200; //set invisible
 									
 								}
 								
@@ -204,9 +204,9 @@
 			{
 				if (stick is MovingStick)
 				{
-					var temp:MovingStick = stick as MovingStick; //转换类
+					var temp:MovingStick = stick as MovingStick; 
 					temp.x += temp.hVelocity;
-					//碰到边界，或者Math.random小于0.01
+
 					if ((temp.x > stageWidth - temp.width) && temp.hVelocity > 0 || (temp.x < temp.width) && temp.hVelocity < 0 || Math.random() < 0.01)
 						temp.hVelocity *= -1;
 				}
@@ -214,7 +214,7 @@
 			
 			refreashSticks();
 			doodle.vVelocity += GRAVITY;
-			doodle.hVelocity *= 0.6; //水平速度衰减
+			doodle.hVelocity *= 0.6; //Horizontal velocity attenuation
 			
 			//outside
 			if (doodle.x > stage.stageWidth + 25)
@@ -232,14 +232,14 @@
 		private function refreashSticks():void
 		{
 			var stick:Stick;
-			//add new sticks
+			//remove old sticks
 			while (stageStickArr[0].y > stage.stageHeight)
 			{
-				//超出了边界，删除
+				//exceed the border
 				sceneLayer.removeChild(stageStickArr[0]);
 				stick = stageStickArr.shift();
 				
-				//并将其复制到数组中
+
 				if (stick is NormalStick)
 					normalStickArr.push(stick);
 				else if (stick is MovingStick)
@@ -247,14 +247,12 @@
 				else if (stick is GlassStick)
 					glassStickArr.push(stick);
 			}
-			//remove old sticks
+			//add new sticks
 			while (stageStickArr[stageStickArr.length - 1].y > -300)
 			{
-				//若是末尾元素
 				
 				stick = getNewStick();
 				
-				//x位置
 				stick.x = Math.random() * (stage.stageWidth - stick.width) + stick.width / 2;
 				
 				
@@ -264,13 +262,13 @@
 				
 				stick.y = stageStickArr[stageStickArr.length - 1].y + min + Math.random() * (max - min);
 				
-				//添加stick到数组
+
 				stageStickArr.push(stick);				
 				sceneLayer.addChild(stick);
 				
 				var distance:Number = stageStickArr[stageStickArr.length - 2].y - stageStickArr[stageStickArr.length - 1].y;
 				
-				//设置brokenStick
+				//add brokenStick
 				if (Math.random() < 0.1 && distance > 60)
 				{
 					stick = new BrokenStick();
