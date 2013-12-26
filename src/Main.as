@@ -22,7 +22,7 @@
 		public static var stageWidth:Number;
 		public static var stageHeight:Number;
 		
-		public static const V0:Number = -20;//速度默认值
+		public static const V0:Number = -20; //速度默认值
 		public static const S:Number = 20 * 20 / 2;
 		public static const GRAVITY:Number = 1;
 		
@@ -88,6 +88,7 @@
 			time = 0;
 			doodle.vVelocity = 0;
 			doodle.hVelocity = 0;
+			doodle.addChild(new Mark);
 			
 			//初始位置
 			charLayer.addChild(doodle);
@@ -119,7 +120,6 @@
 		{
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
-			
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		}
@@ -149,9 +149,9 @@
 				doodle.hVelocity -= 4;
 			if (keyDictionary[Keyboard.RIGHT])
 				doodle.hVelocity += 4;
-				
+			
 			//moving visual
-			doodle.x += doodle.hVelocity;//左右移动
+			doodle.x += doodle.hVelocity; //左右移动
 			
 			//当速度向上时，且到达一定的高度后
 			if (doodle.y <= stage.stageHeight - S - 35 && doodle.vVelocity < 0)
@@ -165,22 +165,39 @@
 			}
 			else
 			{
-				for (var i:int = 0; i < 2; i++)   //incase break through
+				
+				//下落过程
+				for (var i:int = 0; i < 2; i++)
 				{
-					//下落过程
+					//防止穿透
 					if (doodle.vVelocity >= 0)
+					{
+						
 						for each (stick in stageStickArr)
+						{
+							
 							if (doodle.legs.hitTestObject(stick))
+							{
+								
 								if (stick is BrokenStick)
-									BrokenStick(stick).drop();
+								{
+									BrokenStick(stick).drop(); //碰到易碎物件
+									doodle.vVelocity = V0 / 4;
+								}
 								else
 								{
+									doodle.y = stick.y - doodle.height / 2 - stick.height / 2;
 									doodle.vVelocity = V0;
 									if (stick is GlassStick)
-										stick.y = stageHeight + 200;//让其超出屏幕，不可见
+										stick.y = stageHeight + 200; //让其超出屏幕，不可见
+									
 								}
-					doodle.y += doodle.vVelocity / 2;
-				} 
+								
+							}
+						}
+					}
+					doodle.y += doodle.vVelocity/2;
+				}
 			}
 			
 			//moving sticks  the Math.random()<0.01 drive them crazy
@@ -188,23 +205,24 @@
 			{
 				if (stick is MovingStick)
 				{
-					var temp:MovingStick = stick as MovingStick;
+					var temp:MovingStick = stick as MovingStick; //转换类
 					temp.x += temp.hVelocity;
-					if ((temp.x > stageWidth-temp.width) && temp.hVelocity > 0 || (temp.x < temp.width) && temp.hVelocity < 0 || Math.random()<0.01)
+					//碰到边界，或者Math.random小于0.01
+					if ((temp.x > stageWidth - temp.width) && temp.hVelocity > 0 || (temp.x < temp.width) && temp.hVelocity < 0 || Math.random() < 0.01)
 						temp.hVelocity *= -1;
 				}
 			}
 			
 			refreashSticks();
 			doodle.vVelocity += GRAVITY;
-			doodle.hVelocity *= 0.5;
+			doodle.hVelocity *= 0.6; //水平速度衰减
 			
 			//outside
 			if (doodle.x > stage.stageWidth + 25)
 				doodle.x -= stage.stageWidth + 25;
 			if (doodle.x < -25)
 				doodle.x += stage.stageWidth + 25;
-				
+			
 			//char direction
 			if (doodle.hVelocity > 0)
 				doodle.scaleX = -1;
@@ -218,8 +236,11 @@
 			//add new sticks
 			while (stageStickArr[0].y > stage.stageHeight)
 			{
+				//超出了边界，删除
 				sceneLayer.removeChild(stageStickArr[0]);
 				stick = stageStickArr.shift();
+				
+				//并将其复制到数组中
 				if (stick is NormalStick)
 					normalStickArr.push(stick);
 				else if (stick is MovingStick)
@@ -230,20 +251,34 @@
 			//remove old sticks
 			while (stageStickArr[stageStickArr.length - 1].y > -300)
 			{
+				//若是末尾元素
+				
 				stick = getNewStick();
+				stick.addChild(new Mark);
+				
+				//x位置
 				stick.x = Math.random() * (stage.stageWidth - stick.width) + stick.width / 2;
+				
+				
 				var max:Number = -S * Math.min(1, score / 10000 + 0.5) + 10;
 				var min:Number = -S * Math.min(0.5, score / 10000) - 20;
-				stick.y = stageStickArr[stageStickArr.length - 1].y  + min + Math.random()*(max-min);
-				stageStickArr.push(stick);
+				
+				
+				stick.y = stageStickArr[stageStickArr.length - 1].y + min + Math.random() * (max - min);
+				
+				//添加stick到数组
+				stageStickArr.push(stick);				
 				sceneLayer.addChild(stick);
+				
 				var distance:Number = stageStickArr[stageStickArr.length - 2].y - stageStickArr[stageStickArr.length - 1].y;
-				if (Math.random() < 0.1 && distance>60)
+				
+				//设置brokenStick
+				if (Math.random() < 0.1 && distance > 60)
 				{
 					stick = new BrokenStick();
 					stick.x = Math.random() * (stage.stageWidth - stick.width) + stick.width / 2;
-					stick.y = stageStickArr[stageStickArr.length - 1].y + Math.random() * (distance-40) + 20;
-					stageStickArr.splice(stageStickArr.length - 1,0, stick);
+					stick.y = stageStickArr[stageStickArr.length - 1].y + Math.random() * (distance - 40) + 20;
+					stageStickArr.push(stick);
 					sceneLayer.addChild(stick);
 				}
 			}
@@ -251,7 +286,7 @@
 		
 		public function getNewStick():Stick
 		{
-			if (Math.random() < (score<85000?(9000-score)/10000:0.05))
+			if (Math.random() < (score < 85000 ? (9000 - score) / 10000 : 0.05))
 			{
 				if (normalStickArr.length)
 					return normalStickArr.pop();
@@ -354,7 +389,7 @@ class Stick extends Sprite
 	
 	public function Stick():void
 	{
-		
+	
 	}
 }
 
@@ -402,7 +437,7 @@ class BrokenStick extends Stick
 		
 		rightPart.graphics.lineStyle(1);
 		rightPart.graphics.beginFill(0x7C5A2C);
-		rightPart.graphics.drawRoundRectComplex(2, -5, STICK_WIDTH / 2-2, STICK_HEIGHT, 0, 10, 0, 10);
+		rightPart.graphics.drawRoundRectComplex(2, -5, STICK_WIDTH / 2 - 2, STICK_HEIGHT, 0, 10, 0, 10);
 		//graphics.endFill();
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 	}
