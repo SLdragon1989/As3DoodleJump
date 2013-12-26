@@ -22,7 +22,7 @@
 		public static var stageWidth:Number;
 		public static var stageHeight:Number;
 		
-		public static const V0:Number = -20;
+		public static const V0:Number = -20;//速度默认值
 		public static const S:Number = 20 * 20 / 2;
 		public static const GRAVITY:Number = 1;
 		
@@ -153,11 +153,13 @@
 			//moving visual
 			doodle.x += doodle.hVelocity;//左右移动
 			
-			
+			//当速度向上时，且到达一定的高度后
 			if (doodle.y <= stage.stageHeight - S - 35 && doodle.vVelocity < 0)
 			{
+				//所有Stick会向上平移
 				for each (var stick:Stick in stageStickArr)
 					stick.y -= doodle.vVelocity;
+				//显示分数
 				score -= doodle.vVelocity;
 				scoreText.text = String(score);
 			}
@@ -165,7 +167,7 @@
 			{
 				for (var i:int = 0; i < 2; i++)   //incase break through
 				{
-					
+					//下落过程
 					if (doodle.vVelocity >= 0)
 						for each (stick in stageStickArr)
 							if (doodle.legs.hitTestObject(stick))
@@ -175,10 +177,10 @@
 								{
 									doodle.vVelocity = V0;
 									if (stick is GlassStick)
-										stick.y = stageHeight + 200;
+										stick.y = stageHeight + 200;//让其超出屏幕，不可见
 								}
 					doodle.y += doodle.vVelocity / 2;
-				}
+				} 
 			}
 			
 			//moving sticks  the Math.random()<0.01 drive them crazy
