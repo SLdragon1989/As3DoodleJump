@@ -88,7 +88,6 @@
 			time = 0;
 			doodle.vVelocity = 0;
 			doodle.hVelocity = 0;
-			doodle.addChild(new Mark);
 			
 			//初始位置
 			charLayer.addChild(doodle);
@@ -254,7 +253,6 @@
 				//若是末尾元素
 				
 				stick = getNewStick();
-				stick.addChild(new Mark);
 				
 				//x位置
 				stick.x = Math.random() * (stage.stageWidth - stick.width) + stick.width / 2;
